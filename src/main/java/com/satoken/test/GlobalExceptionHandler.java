@@ -5,27 +5,63 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * 全局异常处理
+ * @author wyh
+ * @date 2021/11/12 15:46
  */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 全局异常拦截（拦截项目中的所有异常）
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(NotLoginException.class)
+    public String handlerNotLoginException(NotLoginException nle, HttpServletRequest request, HttpServletResponse response) {
+
+        // 打印堆栈，以供调试
+        log.error("exception handler ->", nle);
+
+        // 判断场景值，定制化异常信息
+        String message = "当前会话未登录";
+        switch (nle.getType()) {
+            case NotLoginException.NOT_TOKEN:
+                message = "未提供token";
+                break;
+            case NotLoginException.INVALID_TOKEN:
+                message = "token无效";
+                break;
+            case NotLoginException.TOKEN_TIMEOUT:
+                message = "token已过期";
+                break;
+            case NotLoginException.BE_REPLACED:
+                message = "token已被顶下线";
+                break;
+            case NotLoginException.KICK_OUT:
+                message = "token已被踢下线";
+                break;
+            default:
+                break;
+        }
+
+        // 返回给前端
+        return message;
+    }
+
     @ExceptionHandler
-    public String handlerException(Exception e, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> handlerException(Exception e, HttpServletRequest request, HttpServletResponse response) {
 
         // 打印堆栈，以供调试
         log.error("exception handler ->", e);
 
         // 不同异常返回不同状态码
+        ResponseEntity.BodyBuilder body = ResponseEntity.status(HttpStatus.FORBIDDEN);
+
         String message;
         if (e instanceof NotRoleException) {
             // 如果是角色异常
@@ -42,36 +78,10 @@ public class GlobalExceptionHandler {
         } else {
             // 普通异常
             message = "系统异常";
+            body = ResponseEntity.status(HttpStatus.BAD_REQUEST);
         }
 
         // 返回给前端
-        return message;
+        return body.body(message);
     }
-
-    @ExceptionHandler(NotLoginException.class)
-    public String handlerNotLoginException(NotLoginException nle, HttpServletRequest request, HttpServletResponse response) {
-
-        // 打印堆栈，以供调试
-        log.error("exception handler ->", nle);
-
-        // 判断场景值，定制化异常信息
-        String message = "";
-        if (nle.getType().equals(NotLoginException.NOT_TOKEN)) {
-            message = "未提供token";
-        } else if (nle.getType().equals(NotLoginException.INVALID_TOKEN)) {
-            message = "token无效";
-        } else if (nle.getType().equals(NotLoginException.TOKEN_TIMEOUT)) {
-            message = "token已过期";
-        } else if (nle.getType().equals(NotLoginException.BE_REPLACED)) {
-            message = "token已被顶下线";
-        } else if (nle.getType().equals(NotLoginException.KICK_OUT)) {
-            message = "token已被踢下线";
-        } else {
-            message = "当前会话未登录";
-        }
-
-        // 返回给前端
-        return message;
-    }
-
 }

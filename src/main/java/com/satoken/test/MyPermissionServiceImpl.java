@@ -15,7 +15,7 @@ import java.util.Objects;
 @Component
 public class MyPermissionServiceImpl implements StpInterface {
 
-    private static final String ADMIN_ID = "1";
+    private static final String ADMIN_ID = "root";
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
@@ -32,7 +32,7 @@ public class MyPermissionServiceImpl implements StpInterface {
         if (Objects.equals(ADMIN_ID, loginIdStr)) {
             return adminPermissionAndRole();
         }
-        return Arrays.asList("userA", "userB", "userC");
+        return Arrays.asList("a", "b", "c");
     }
 
 

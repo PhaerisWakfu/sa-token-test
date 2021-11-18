@@ -6,18 +6,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * 自定义侦听器的实现
+ * @author wyh
+ * @date 2021/11/12 15:46
  */
 @Component
 @Slf4j
-public class MySaTokenListener implements SaTokenListener {
+public class LoginListener implements SaTokenListener {
 
     /**
      * 每次登录时触发
      */
     @Override
     public void doLogin(String loginType, Object loginId, SaLoginModel loginModel) {
-        log.info("user [{}] <login> succeed, loginType [{}], loginDevice [{}].", loginId, loginType, loginModel.getDeviceOrDefault());
+        log.info("user [{}] login succeed, loginDevice [{}].", loginId, loginModel.getDeviceOrDefault());
     }
 
     /**
@@ -25,7 +26,7 @@ public class MySaTokenListener implements SaTokenListener {
      */
     @Override
     public void doLogout(String loginType, Object loginId, String tokenValue) {
-        log.info("user [{}] <logout> succeed, loginType [{}].", loginId, loginType);
+        log.info("user [{}] logout succeed.", loginId);
     }
 
     /**

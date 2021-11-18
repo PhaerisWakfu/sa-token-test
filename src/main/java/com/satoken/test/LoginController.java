@@ -17,26 +17,24 @@ public class LoginController {
 
     @GetMapping("/login")
     public String login(String username, String password) {
-        if (!Objects.equals("123", username) || !Objects.equals("456", password)) {
+        if (Objects.equals("admin", username) && Objects.equals("admin", password)) {
+            StpUtil.login("root");
+        } else if (Objects.equals("123", username) && Objects.equals("456", password)) {
+            StpUtil.login("test");
+        } else {
             return "登录失败";
         }
-        StpUtil.login(1);
         return "登录成功";
     }
 
     @GetMapping("/logout")
     public String logout() {
-        StpUtil.logout(1);
+        StpUtil.logout();
         return "登出成功";
     }
 
-    @GetMapping("/status")
-    public Boolean status() {
-        return StpUtil.isLogin();
-    }
-
     @GetMapping("/token-info")
-    @SaCheckPermission("user-cat")
+    @SaCheckPermission(value = "user-cat", orRole = "a")
     public SaTokenInfo tokenInfo() {
         return StpUtil.getTokenInfo();
     }
