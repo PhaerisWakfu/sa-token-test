@@ -27,12 +27,6 @@ public class LoginController {
         return "登录成功";
     }
 
-    @GetMapping("/logout")
-    public String logout() {
-        StpUtil.logout();
-        return "登出成功";
-    }
-
     @GetMapping("/token-info")
     @SaCheckPermission(value = "user-cat", orRole = "a")
     public SaTokenInfo tokenInfo() {
