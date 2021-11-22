@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
         log.error("exception handler ->", nle);
 
         // 判断场景值，定制化异常信息
-        String message = "当前会话未登录";
+        String message;
         switch (nle.getType()) {
             case NotLoginException.NOT_TOKEN:
                 message = "未提供token";
@@ -46,6 +46,7 @@ public class GlobalExceptionHandler {
                 message = "token已被踢下线";
                 break;
             default:
+                message = "当前会话未登录";
                 break;
         }
 
